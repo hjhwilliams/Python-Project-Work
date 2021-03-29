@@ -1,0 +1,57 @@
+import codecademylib3_seaborn
+from bs4 import BeautifulSoup
+import requests
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+webpage_response=requests.get('https://content.codecademy.com/courses/beautifulsoup/cacao/index.html')
+
+webpage= webpage_response.content
+#Generate a a beautiful soup object from the html of the website 
+soup= BeautifulSoup(webpage, "html.parser")
+ratings=[]
+rating=soup.select('.Rating')
+
+#Loop through the ratings tags and get the text contain in each one
+for a in rating[1:]:
+  ratings.append(float(a.get_text()))
+
+#Print as a histogram
+plt.hist(ratings)
+plt.show()
+
+#Extract the company names from the html elements
+company_name=soup.select('.Company')
+company_names=[]
+
+#Loop through company tags and extract the text in each one. Then add to list company_names 
+for a in company_name[1:]:
+  company_names.append(a.get_text())
+#print(company_names)
+
+#Generate a dataframe with columns 'Company' and 'Ratings' and add the corresponding lists.
+d={'Company': company_names,'Ratings': ratings}
+choco_df=pd.DataFrame.from_dict(d)
+
+#Find average rating of each company and then find the 10 highest rated chocolate companies
+mean_vals=choco_df.groupby('Company').Ratings.mean()
+ten_best= mean_vals.nlargest(10)
+#print(ten_best)
+
+#Generate a list that contains all the cocoa percentages.
+cocoa_perct=soup.select('.CocoaPercent')
+cocoa_percts=[]
+
+#Extract the cocoa percentages from the html elements and store in the list cocoa_percts
+for a in cocoa_perct[1:]:
+  percent=int(float(a.get_text().strip('%')))
+  cocoa_percts.append(percent)
+#print(cocoa_percts)
+
+#Add Cocoapercentage to dictionary d. Then add it into the dataframe. 
+d['CocoaPercentage']=cocoa_percts
+choco_df=pd.DataFrame.from_dict(d)
+
+
+
