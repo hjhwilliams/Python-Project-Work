@@ -1,0 +1,33 @@
+#Import Codecademy lib and Pandas Module
+import codecademylib
+import pandas as pd
+
+#Load the data into dataframe called inventory
+inventory=pd.read_csv('inventory.csv')
+
+#Inspect first 10 rows
+print(inventory.head(10))
+
+#Save first 10 rows in 'Staten_island
+staten_island=inventory.head(10)
+
+#Save the product description in variable product_request
+product_request=staten_island['product_description']
+
+#Select all rows where location is equal to Brooklyn and product type is equal to seeds
+seed_request=inventory[(inventory.location == 'Brooklyn') & (inventory.product_type == 'seeds')]
+
+#Add 'In Stock' column to inventory. True if quanity is greater than 0 and False if quantity equals 0.
+inventory['in_stock']= inventory.quantity.apply(lambda x: 'True' if x>0 else 'False' )
+
+#Add column (total_value) that is equal to price multiplied by quantity
+total_value=lambda row: row.quantity *row.price
+inventory['total_value']=inventory.apply(total_value,axis =1)
+
+#Add column, full_description that has complete description of each product
+combine_lambda = lambda row: \
+    '{} - {}'.format(row.product_type,
+                     row.product_description)
+inventory['full_description']=inventory.apply(combine_lambda,axis=1)  
+print(inventory)        
+
